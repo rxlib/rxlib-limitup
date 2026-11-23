@@ -1,0 +1,117 @@
+# rxlib_leading 仓库忽略规则
+# 原则：敏感配置、本地大数据、运行时与构建产物、编辑器杂项不入库；
+#      源码、启动脚本、release 代码、配置模板、私有 pyd 模块需要入库。
+
+# ==================================================
+# 1. 敏感配置（绝不提交）
+# ==================================================
+# 真实数据库口令、API Token、登录密码哈希、cookie secret 都在这些文件中。
+config/config.ini
+app/releases/*/config/config.ini
+_factorlab_settings.json
+.env
+.env.*
+config/*.local.ini
+config/*.local.json
+.streamlit/secrets.toml
+
+# 本机自选池属于个人数据，不入库。
+config/watchlists/
+
+# 注意：配置模板 config.example.ini 必须保留，
+#       不要使用 config/*.ini 这类会误伤模板的通配规则。
+
+# ==================================================
+# 2. 本地大数据与运行产物
+# ==================================================
+# 便携 Python 运行时（约 380MB，单独分发，不随代码库提交）。
+runtime/
+
+# 行情月片 / 面板 / 盘中缓存（根目录与 release 目录内都可能存在，可按需重建）。
+**/data/cache/
+# 回测结果与导出文件。
+**/data/results/
+# 运行日志。
+**/logs/
+*.log
+
+# app/current 是指向 app/releases/<version> 的 Windows Junction。
+# Git 不能保存 Junction，入库会把同一份 release 代码重复跟踪一遍；
+# 克隆后按 README 用 mklink /J 重建即可。
+app/current
+
+# 1.0.1 是本地回滚源与编辑基线，目录内含明文策略源码，整目录不入库。
+# 仓库只收录已加密编译的 1.0.2；克隆后不要指望能切回 1.0.1。
+app/releases/1.0.1/
+
+# ==================================================
+# 3. 构建 / 编译 / Python 缓存
+# ==================================================
+__pycache__/
+*.pyc
+*.pyo
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+_build/
+_dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+
+# 关于 *.pyd：
+# 本项目的 rx_secret.cp312-win_amd64.pyd 是运行时必需的私有编译模块，
+# 不能按普通 Python 构建产物忽略，因此这里故意不写 *.pyd / *.py[cod]。
+# 若决定只公开源码、不分发二进制，请改为显式忽略：
+# app/releases/*/rx_secret*.pyd
+
+# ==================================================
+# 4. 临时文件 / 本地备份 / 本地测试脚本
+# ==================================================
+# 本地探针、校验、调试脚本属于一次性验证工具，不入库。
+# 若以后编写正式的单元测试，请在该规则之后单独用 !tests/** 放行。
+_probe_*.py
+_verify_*.py
+_chk_*.py
+_dbg_*.py
+_diag_*.py
+_inspect_*.py
+test_*.py
+*_test.py
+tests/
+_ver/
+
+_backup/
+_v_scan.py
+.screenshots/
+.trae-html-share-packages/
+*.tmp
+*.bak
+*.swp
+*~
+
+# 内部维护文档（含本机状态、敏感文件清单与发版流程），不入库。
+内部文档.md
+
+# 策略研究 / 回测验证脚本属于本地分析工具，含因子推导与验证逻辑，整目录不入库。
+# 该规则同时覆盖此前单独列出的 scripts/_inspect_tables.py（含硬编码数据库连接参数），
+# 因此不再保留单文件规则，避免冗余。
+scripts/
+
+# ==================================================
+# 5. 编辑器 / 操作系统
+# ==================================================
+.trae/
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
