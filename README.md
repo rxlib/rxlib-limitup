@@ -147,15 +147,13 @@ rxlib_limitup/
 - Python：`runtime/python312` 内的便携 Python 3.12.6，不要求系统安装 Python。
 - 依赖：`runtime/python312/pylibs` 已包含 Streamlit、pandas、numpy、pymysql、plotly/altair、xlrd 等运行依赖；启动脚本通过 `PYTHONPATH` 注入，不使用 pip。
 - 编译模块：`rx_secret.cp312-win_amd64.pyd` 必须与运行时匹配（CPython 3.12 / win_amd64）。缺少该文件时 `rx_core.py` 无法导入。
-- `runtime/` 约 382 MB / 1.2 万个文件，不随 Git 仓库提供，而是作为 **Release 资产**分发。受单附件 100 MB 限制，运行时被拆成 3 个包，需全部下载：
+- `runtime/` 约 382 MB / 1.2 万个文件，不随 Git 仓库提供，而是作为 **Release 资产**分发：
 
 | 资产文件 | 内容 | 大小 |
 | --- | --- | --- |
-| `runtime-python312-core.zip` | `runtime/python312` 除 `pylibs` 外的部分（python.exe、DLLs、Lib、tcl 等） | 约 20 MB |
-| `runtime-python312-pylibs-A.zip` | `runtime/python312/pylibs` 的第 1 部分 | 约 60 MB |
-| `runtime-python312-pylibs-B.zip` | `runtime/python312/pylibs` 的第 2 部分 | 约 42 MB |
+| `runtime-python312.zip` | 完整的 `runtime/python312`（python.exe、DLLs、Lib、tcl、pylibs） | 约 122 MB |
 
-下载地址：<https://gitcode.com/rxlibpub/rxlib-limitup/releases>。把 3 个压缩包**都解压到仓库根目录**（提示合并时选择覆盖/合并即可），最终确保存在：
+下载地址：<https://gitcode.com/rxlibpub/rxlib-limitup/releases>。把压缩包解压到仓库根目录，最终确保存在：
 
 ```
 runtime\python312\python.exe
