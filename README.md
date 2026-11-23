@@ -1,6 +1,6 @@
 # rxlib 涨停打板量化面板
 
-![logo](D:\rxlib_limitup\logo.png)
+![logo](logo.png)
 
 `rxlib_limitup` 是一个本地运行的 A 股涨停打板量化研究面板：用随包提供的 **便携 Python 3.12** 运行，行情可通过 **rxlib API** 或 **直连 MySQL** 获取。平台只做历史回测与盘后复盘选股，不接实盘交易，对数据库只读。
 
