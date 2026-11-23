@@ -37,7 +37,7 @@
 - 买入时点：当日涨停收盘、次日开盘追板、次日收盘追板。
 - 过滤条件：连板高度、接力昨日连板数、近 N 日有涨停、高位阈值、封板强度量比、排除 ST、排除次新股。
 - 出场条件：止损、止盈、最大持有交易日、断板即出、炸板即出。
-- 板块条件：板块涨停家数上下限、封板口径（`seal` / `touch`）、板块涨幅下限、板块层级（TGN / THY1 / THY2 / THY3）。
+- 板块条件：板块涨停家数上下限、封板口径（`seal` / `touch`）、板块涨幅下限、板块层级。
 - 费率：单边费率（bp），买卖各计一次；默认 0。
 
 回测内核在 `limit_up_lab.py`，复用 `factor_lab.py` 构建的数据面板；界面只负责收集参数、调用内核和展示结果。
@@ -153,7 +153,7 @@ rxlib_limitup/
 | --- | --- | --- |
 | `runtime.zip` | 完整的 `runtime/python312`（python.exe、DLLs、Lib、tcl、pylibs） | 约 122 MB |
 
-下载地址：<https://gitcode.com/rxlibpub/rxlib-limitup/releases/tag/py312-v1>。把压缩包解压到仓库根目录，最终确保存在：
+下载地址：<https://gitcode.com/rxlibpub/rxlib-limitup/releases/download/py312-v1/runtime.zip>。把压缩包解压到仓库根目录，最终确保存在：
 
 ```
 runtime\python312\python.exe
@@ -226,7 +226,7 @@ start.bat
 
 ```powershell
 .\run.ps1
-.\run.ps1 -Port 8599
+.\run.ps1 -Port 8508
 ```
 
 脚本会读取 `app/current/manifest.json` 选择运行时，设置 `PYTHONPATH`，启动 Streamlit，并在服务就绪后打开浏览器。默认地址：
