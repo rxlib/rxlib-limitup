@@ -147,13 +147,13 @@ rxlib_limitup/
 - Python：`runtime/python312` 内的便携 Python 3.12.6，不要求系统安装 Python。
 - 依赖：`runtime/python312/pylibs` 已包含 Streamlit、pandas、numpy、pymysql、plotly/altair、xlrd 等运行依赖；启动脚本通过 `PYTHONPATH` 注入，不使用 pip。
 - 编译模块：`rx_secret.cp312-win_amd64.pyd` 必须与运行时匹配（CPython 3.12 / win_amd64）。缺少该文件时 `rx_core.py` 无法导入。
-- `runtime/` 约 382 MB / 1.2 万个文件，不随 Git 仓库提供，而是作为 **Release 资产**分发：
+- `runtime/` 约 382 MB / 1.2 万个文件，不随 Git 仓库提供，而是作为 **Release 资产**分发（首次启动会自动下载，见「快速开始」）：
 
 | 资产文件 | 内容 | 大小 |
 | --- | --- | --- |
-| `runtime-python312.zip` | 完整的 `runtime/python312`（python.exe、DLLs、Lib、tcl、pylibs） | 约 122 MB |
+| `runtime.zip` | 完整的 `runtime/python312`（python.exe、DLLs、Lib、tcl、pylibs） | 约 122 MB |
 
-下载地址：<https://gitcode.com/rxlibpub/rxlib-limitup/releases>。把压缩包解压到仓库根目录，最终确保存在：
+下载地址：<https://gitcode.com/rxlibpub/rxlib-limitup/releases/tag/py312-v1>。把压缩包解压到仓库根目录，最终确保存在：
 
 ```
 runtime\python312\python.exe
@@ -168,7 +168,20 @@ runtime\python312\pylibs\
 
 ### 1. 准备运行时
 
-把便携运行时放到 `runtime/python312`，确认 `runtime\python312\python.exe` 与 `runtime\python312\pylibs` 存在。仓库不包含运行时，也没有自动下载逻辑。
+**无需手动准备**：双击启动脚本时，`run.ps1` 会检测 `runtime\<版本>\python.exe` 与 `runtime\<版本>\pylibs`，缺失时自动从 Release 资产下载并解压：
+
+```
+https://gitcode.com/rxlibpub/rxlib-limitup/releases/download/py312-v1/runtime.zip
+```
+
+下载约 122 MB，解压后形成 `runtime\python312\...`。如需换镜像或离线安装，可用参数或环境变量覆盖地址：
+
+```powershell
+.\run.ps1 -RuntimeUrl "https://你的地址/runtime.zip"
+$env:RXLIB_RUNTIME_URL = "https://你的地址/runtime.zip"
+```
+
+也可以手动下载该 zip 并解压到仓库根目录，效果相同。
 
 ### 2. 准备 app/current
 

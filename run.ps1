@@ -1,4 +1,4 @@
-﻿﻿param([int]$Port = 8508)
+﻿param([int]$Port = 8508, [string]$RuntimeUrl = '')
 
 function Test-LocalPort([int]$TargetPort) {
     $client = New-Object System.Net.Sockets.TcpClient
@@ -37,7 +37,60 @@ $manifest = Get-Content $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $runtimeName = $manifest.runtime
 if (-not $runtimeName) { $runtimeName = 'python310' }
 
+# 运行时不入库，首次使用自动从 Release 资产下载并解压到根目录。
+if (-not $RuntimeUrl) { $RuntimeUrl = $env:RXLIB_RUNTIME_URL }
+if (-not $RuntimeUrl) {
+    $RuntimeUrl = 'https://gitcode.com/rxlibpub/rxlib-limitup/releases/download/py312-v1/runtime.zip'
+}
+
+function Ensure-Runtime([string]$Name, [string]$Url) {
+    $py = Join-Path $Root ("runtime\{0}\python.exe" -f $Name)
+    $pylibs = Join-Path $Root ("runtime\{0}\pylibs" -f $Name)
+    if ((Test-Path $py) -and (Test-Path $pylibs)) { return }
+
+    Write-Host '未检测到便携 Python 运行时，开始自动下载（约 122 MB）...' -ForegroundColor Yellow
+    Write-Host "下载地址：$Url"
+    $tmp = Join-Path $env:TEMP ('rxlib-runtime-{0}.zip' -f [guid]::NewGuid().ToString('N'))
+    $oldPref = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    try {
+        Invoke-WebRequest -Uri $Url -OutFile $tmp -UseBasicParsing
+    } catch {
+        Write-Host "运行时下载失败：$($_.Exception.Message)" -ForegroundColor Red
+        Write-Host '可手动下载该 zip 并解压到本目录（生成 runtime\python312\...），再重新启动。' -ForegroundColor Yellow
+        Read-Host '按回车退出'
+        exit 1
+    } finally {
+        $ProgressPreference = $oldPref
+    }
+    if (-not (Test-Path $tmp) -or (Get-Item $tmp).Length -lt 50MB) {
+        Write-Host '下载的运行时文件不完整，请重试。' -ForegroundColor Red
+        Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+        Read-Host '按回车退出'
+        exit 1
+    }
+
+    Write-Host '正在解压运行时...'
+    if (Get-Command tar.exe -ErrorAction SilentlyContinue) {
+        & tar.exe -xf $tmp -C $Root
+    } else {
+        Expand-Archive -Path $tmp -DestinationPath $Root -Force
+    }
+    Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+
+    if (-not (Test-Path $py)) {
+        Write-Host "解压后仍未找到 $py，请手动解压 runtime.zip 到本目录。" -ForegroundColor Red
+        Read-Host '按回车退出'
+        exit 1
+    }
+    Write-Host '运行时准备完成。' -ForegroundColor Green
+}
+
+Ensure-Runtime $runtimeName $RuntimeUrl
+
 $Python = Join-Path $Root (Join-Path "runtime\$runtimeName" 'python.exe')
+
 $Pylibs = Join-Path $Root "runtime\$runtimeName\pylibs"
 
 if (-not (Test-Path $Python)) {
