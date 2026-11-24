@@ -887,12 +887,16 @@ def tab_limit(state):
                '选单日区间时，本明细即当天选中的股票名单。')
     if len(tr):
         tr = tr.reset_index(drop=True)
+        tr = tr.drop(columns=['rxcode'], errors='ignore')
+        if 'sector_title' in tr.columns:
+            tr['sector_title'] = (tr['sector_title'].astype(str)
+                                  .str.replace('THY3·', '', regex=False))
         tr.insert(1, '状态', tr['exit_reason'].map(
             lambda r: '持仓中' if r == 'open' else '已平仓'))
         tr.insert(len(tr.columns) - 1, '浮盈(%)', (tr['ret_pct'] * 100).round(2))
         tr.index = tr.index + 1
         tr.index.name = '序号'
-    st.dataframe(tr, use_container_width=True, height=320)
+    st.dataframe(tr, use_container_width=True)
     _td1, _td2 = st.columns([1, 1], gap="small")
     with _td1:
         st.download_button('下载交易明细（UTF-8）',
@@ -1007,7 +1011,7 @@ def tab_watch_pool(state):
             'open_price': '开盘价'})
         show['板块'] = (show['板块'].astype(str)
                         .str.replace('THY3·', '', regex=False))
-    st.dataframe(show, use_container_width=True, height=360, hide_index=True,
+    st.dataframe(show, use_container_width=True, hide_index=True,
                  column_config={
                      '涨停价': st.column_config.NumberColumn(format='%.2f'),
                      '开盘价': st.column_config.NumberColumn(format='%.2f')})
@@ -1054,7 +1058,7 @@ def tab_watch_pool(state):
             view = view.sort_values(['_so', '涨跌幅%'],
                                     ascending=[True, False]).drop(columns='_so') \
                        .reset_index(drop=True)
-            st.dataframe(view, use_container_width=True, height=360, hide_index=True,
+            st.dataframe(view, use_container_width=True, hide_index=True,
                          column_config={
                              '现价': st.column_config.NumberColumn(format='%.2f'),
                              '涨跌幅%': st.column_config.NumberColumn(format='%.2f'),
@@ -1220,7 +1224,7 @@ def tab_sector_watch(state):
             'scenario_note': '备注'})
         show = show.drop(columns=['sector_title'])
     st.markdown('**个股明细（龙头 / 卡位）**')
-    st.dataframe(show, use_container_width=True, height=380, hide_index=True,
+    st.dataframe(show, use_container_width=True, hide_index=True,
                  column_config={
                      '收盘价': st.column_config.NumberColumn(format='%.2f'),
                      '次日涨停参考': st.column_config.NumberColumn(format='%.2f')})
