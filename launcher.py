@@ -19,6 +19,8 @@ import sys
 
 def _bootstrap():
     root = os.path.dirname(os.path.abspath(__file__))
+    # 固定工作目录，确保 Streamlit 读取根目录下的 .streamlit/config.toml。
+    os.chdir(root)
     app_dir = os.path.join(root, 'app', 'current')
     manifest_path = os.path.join(app_dir, 'manifest.json')
 

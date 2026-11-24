@@ -15,6 +15,8 @@ function Test-LocalPort([int]$TargetPort) {
 }
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
+# 固定工作目录，确保 Streamlit 读取根目录下的 .streamlit\config.toml。
+Set-Location $Root
 $AppDir = Join-Path $Root 'app\current'
 $ManifestPath = Join-Path $AppDir 'manifest.json'
 $Entry = Join-Path $AppDir 'factor_lab_ui.py'
